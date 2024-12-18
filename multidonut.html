@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Polar Bar Chart with Custom Labels</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      width: 100%;
+    }
+    #chart-container {
+      width: 100%;
+      height: 70vh; /* Reserve some space for the labels */
+      padding: 10px; 
+    }
+    .multidonut-label-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      height: 20vh; /* Takes 20% height for the labels */
+      box-sizing: border-box;
+    }
+    .label-item {
+      display: flex;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      font-size: 1.5vw; /* Responsive font size based on viewport width */
+      color: #333;
+    }
+    .label-dot {
+      width: 2vw;  /* Responsive dot size */
+      height: 2vw; /* Responsive dot size */
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    /* Media query for smaller screens */
+    @media (max-width: 600px) {
+      .label-item {
+        font-size: 3vw; /* Increase font size for smaller screens */
+      }
+      .label-dot {
+        width: 4vw;  /* Increase dot size for smaller screens */
+        height: 4vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chart-container"></div>
+  <div id="multidonut-label-container" class="multidonut-label-container"></div>
+
+<script>
+    var dom = document.getElementById("chart-container");
+    var labelContainer = document.getElementById("multidonut-label-container");
+    var myChart = echarts.init(dom, "light", {
+      renderer: "canvas",
+      useDirtyRect: true
+    });
+
+    var data = [
+      { value: 40, name: "Others", color: "rgba(121, 212, 232, 0.8)" },
+      { value: 20, name: "Not Picked", color: "rgba(255, 79, 79, 0.8)" },
+      { value: 30, name: "Not Interested", color: "rgba(215, 117, 121, 0.8)" },
+      { value: 20, name: "Rescheduled", color: "rgba(193, 109, 207, 0.8)" },
+      { value: 10, name: "Engaged", color: "rgba(109, 131, 207, 0.8)" },
+    ];
+
+    // Function to generate the label elements dynamically
+    function renderLabels() {
+      labelContainer.innerHTML = ''; // Clear previous labels
+
+      data.forEach(item => {
+        var labelItem = document.createElement('div');
+        labelItem.className = 'label-item';
+
+        var labelDot = document.createElement('div');
+        labelDot.className = 'label-dot';
+        labelDot.style.backgroundColor = item.color;
+
+        var labelText = document.createElement('span');
+        labelText.textContent = `${item.name}`;
+
+        labelItem.appendChild(labelDot);
+        labelItem.appendChild(labelText);
+
+        labelContainer.appendChild(labelItem);
+      });
+    }
+
+    // Chart configuration
+    var option = {
+      backgroundColor: 'transparent',
+      polar: {
+        radius: ["20%", "65%"]
+      },
+      angleAxis: {
+        max: 50,
+        startAngle: 0,
+        endAngle: 360,
+        show: false
+      },
+      radiusAxis: {
+        axisLabel: {
+          show: false,
+          interval: 0,
+          margin: 20,
+          fontSize: 16,
+          fontWeight: 200,
+          fontFamily: "Noto Sans SC",
+          color: "black"
+        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        show: false,
+        type: "category",
+        data: data.map(item => item.name)
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: function (params) {
+          var value = params.value;
+          var name = params.name;
+          return `
+            <div style="text-align: center;">
+              <div>${name}</div>
+              <hr style="margin: 5px 0; border: 1px solid #ccc;">
+              <div>${value}</div>
+            </div>
+          `;
+        }
+      },
+      legend: {
+        show: false  // Hide the default legend
+      },
+      series: [
+        {
+          type: "bar",
+          roundCap: true,
+          data: data.map(item => ({
+            value: item.value,
+            itemStyle: {
+              color: item.color  // Ensure colors match the label colors
+            }
+          })),
+          showBackground: true,
+          coordinateSystem: "polar",
+          barGap: '60%',
+          barCategoryGap: '60%',
+          itemStyle: {
+            borderColor: 'transparent',
+            borderWidth: 0,
+          },
+          label: {
+            show: false,
+            position: 'outside',
+            formatter: '{b}: {c}',
+            color: '#333',
+            fontSize: 12,
+          }
+        }
+      ]
+    };
+
+    if (option && typeof option === "object") {
+      myChart.setOption(option);
+    }
+
+    // Render labels initially
+    renderLabels();
+
+    // Re-render labels and adjust chart on window resize
+    window.addEventListener("resize", function() {
+      myChart.resize();  
+      renderLabels();    
+    });
+</script>
+
+</body>                
+</html>

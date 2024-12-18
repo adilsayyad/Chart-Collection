@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Polar Bar Chart with Legend</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    #conversion-overview-donutchart ,#conversion-overview-donutchart2{
+      width: 100px;
+      height: 100px;
+      padding: 30px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="conversion-overview-donutchart"></div>
+  <div id="conversion-overview-donutchart2"></div>
+
+  <script>
+    var dom = document.getElementById("conversion-overview-donutchart");
+    var myChart = echarts.init(dom, "dark", {
+      renderer: "canvas",
+      useDirtyRect: true
+    });
+
+    var data = [
+      { value: 10, name: "Other", color: "rgba(38, 191, 148, 1)" },
+    ];
+
+    var option = {
+      backgroundColor: 'transparent',
+      polar: {
+        radius: ["80%", "30%"]
+      },
+      angleAxis: {
+        max: 50,
+        startAngle: 100,
+        endAngle: 360,
+        show: false
+      },
+      radiusAxis: {
+        axisLabel: {
+          show: false,
+          interval: 0,
+          margin: 20,
+          fontSize: 16,
+          fontWeight: 200,
+          fontFamily: "Noto Sans SC",
+          color: "black"
+        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        show: true,
+        type: "category",
+        data: data.map(item => item.name)
+      },
+      tooltip: {
+        show: false  // Disable hover tooltip
+      },
+      legend: {
+        orient: 'horizontal',
+        bottom: 0,
+        data: data.map(item => item.name),
+        textStyle: {
+          color: 'black'
+        },
+        itemWidth: 20,
+        itemHeight: 14,
+        itemGap: 10,
+        formatter: function(name) {
+          var color = data.find(item => item.name === name).color;
+          return `{color| } ${name}`;
+        },
+        rich: {
+          color: {
+            backgroundColor: function(params) {
+              var color = data.find(item => item.name === params.name).color;
+              return color;
+            },
+            width: 14,
+            height: 14,
+            borderRadius: 7
+          }
+        }
+      },
+      series: [
+        {
+          type: "bar",
+          roundCap: true,
+          data: data,
+          showBackground: true,
+          coordinateSystem: "polar",
+          barGap: '60%',
+          barCategoryGap: '60%',
+          itemStyle: {
+            color: function(params) {
+              return data[params.dataIndex].color;
+            },
+            borderColor: 'transparent',
+            borderWidth: 0,
+          },
+          label: {
+            show: false,
+          }
+        },
+        {
+          type: 'pie',
+          radius: ['90%', '89%'],
+          center: ['50%', '50%'],
+          hoverAnimation: true,
+          data: [
+            {
+              value: 0,
+              itemStyle: {
+                color: 'rgba(200, 200, 200, 0)'
+              }
+            }
+          ],
+          label: { show: false },
+          tooltip: { show: false }  // Disable hover tooltip for the pie
+        }
+      ],
+      graphic: [
+        {
+          type: 'circle',
+          shape: {
+            cx: '50%',
+            cy: '50%',
+            r: 55
+          },
+          style: {
+            stroke: 'rgba(255, 165, 0, 1)',
+            fill: 'none',
+            lineWidth: 5
+          }
+        },
+        {
+          type: 'image',
+          id: 'logo',
+          right: 'center',
+          top: 'center',
+          style: {
+            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTExLjQyMTIgMS44Mjg4M0MxMS40MjEyIDEuMjc2NTQgMTAuOTczNSAwLjgyODgyNSAxMC40MjEyIDAuODI4ODI1TDEuNDIxMTggMC44Mjg4MjVDMC44Njg4OSAwLjgyODgyNSAwLjQyMTE3NSAxLjI3NjU0IDAuNDIxMTc1IDEuODI4ODNDMC40MjExNzUgMi4zODExMSAwLjg2ODg5IDIuODI4ODMgMS40MjExOCAyLjgyODgzTDkuNDIxMTggMi44Mjg4Mkw5LjQyMTE3IDEwLjgyODhDOS40MjExNyAxMS4zODExIDkuODY4ODkgMTEuODI4OCAxMC40MjEyIDExLjgyODhDMTAuOTczNSAxMS44Mjg4IDExLjQyMTIgMTEuMzgxMSAxMS40MjEyIDEwLjgyODhMMTEuNDIxMiAxLjgyODgzWk0xLjk1NzExIDExLjcwNzFMMTEuMTI4MyAyLjUzNTkzTDkuNzE0MDcgMS4xMjE3MkwwLjU0Mjg5MyAxMC4yOTI5TDEuOTU3MTEgMTEuNzA3MVoiIGZpbGw9IiMyNkJGOTQiLz4KPC9zdmc+Cg==',
+            width: 20,
+            height: 20
+          }
+        }
+      ]
+    };
+
+    if (option && typeof option === "object") {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener("resize", myChart.resize);
+  </script>
+
+
+<script>
+  var dom = document.getElementById("conversion-overview-donutchart2");
+  var myChart = echarts.init(dom, "dark", {
+    renderer: "canvas",
+    useDirtyRect: true
+  });
+
+  var data = [
+    { value: 10, name: "Other", color: "rgba(239, 95, 45, 1)" },
+  ];
+
+  var option = {
+    backgroundColor: 'transparent',
+    polar: {
+      radius: ["80%", "30%"]
+    },
+    angleAxis: {
+      max: 50,
+      startAngle: 100,
+      endAngle: 360,
+      show: false
+    },
+    radiusAxis: {
+      axisLabel: {
+        show: false,
+        interval: 0,
+        margin: 20,
+        fontSize: 16,
+        fontWeight: 200,
+        fontFamily: "Noto Sans SC",
+        color: "black"
+      },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      show: false,
+      type: "category",
+      data: data.map(item => item.name)
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: function (params) {
+        var value = params.value;
+        var name = params.name;
+        return `
+          <div style="text-align: center;">
+            <div>${name}</div>
+            <hr style="margin: 5px 0; border: 1px solid #ccc;">
+            <div>${value}</div>
+          </div>
+        `;
+      }
+    },
+    legend: {
+      orient: 'horizontal',
+      bottom: 0,
+      data: data.map(item => item.name),
+      textStyle: {
+        color: 'black'
+      },
+      itemWidth: 20,
+      itemHeight: 14,
+      itemGap: 10, // Adjust spacing between legend items
+      formatter: function(name) {
+        // Use the color from the data for the legend item
+        var color = data.find(item => item.name === name).color;
+        return `{color| } ${name}`;
+      },
+      rich: {
+        color: {
+          backgroundColor: function(params) {
+            var color = data.find(item => item.name === params.name).color;
+            return color;
+          },
+          width: 14,
+          height: 14,
+          borderRadius: 7
+        }
+      }
+    },
+    series: [
+      // Main bar series
+      {
+        type: "bar",
+        roundCap: true,
+        data: data,
+        showBackground: true,
+        coordinateSystem: "polar",
+        barGap: '60%',
+        barCategoryGap: '60%',
+        itemStyle: {
+          color: function(params) {
+            return data[params.dataIndex].color;
+          },
+          borderColor: 'transparent', // Ensure no border color
+          borderWidth: 0, // Ensure no border width
+        },
+        label: {
+          show: false,
+        }
+      },
+      // Border ring for the last element
+      {
+        type: 'pie',
+        radius: ['90%', '89%'],
+        center: ['50%', '50%'],
+        hoverAnimation: true,
+        data: [
+          {
+            value: 0,
+            itemStyle: {
+              color: 'rgba(200, 200, 200, 0)' // Background ring color
+            }
+          }
+        ],
+        label: {
+          show: false
+        },
+        tooltip: {
+          show: false
+        }
+      }
+    ],
+    graphic: [
+      // Add round border circle
+      {
+        type: 'circle',
+        shape: {
+          cx: '50%',
+          cy: '50%',
+          r: 55
+        },
+        style: {
+          stroke: 'rgba(255, 165, 0, 1)', // Border color (change as needed)
+          fill: 'none',
+          lineWidth: 5
+        }
+      },
+      {
+        type: 'image',
+        id: 'logo',
+        right: 'center',
+        top: 'center',
+        style: {
+          image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAuNTc4ODQgMTAuMTcxMkMwLjU3ODg0IDEwLjcyMzUgMS4wMjY1NiAxMS4xNzEyIDEuNTc4ODQgMTEuMTcxMkgxMC41Nzg4QzExLjEzMTEgMTEuMTcxMiAxMS41Nzg4IDEwLjcyMzUgMTEuNTc4OCAxMC4xNzEyQzExLjU3ODggOS42MTg4OSAxMS4xMzExIDkuMTcxMTggMTAuNTc4OCA5LjE3MTE4SDIuNTc4ODRWMS4xNzExOEMyLjU3ODg0IDAuNjE4ODkgMi4xMzExMyAwLjE3MTE3NSAxLjU3ODg0IDAuMTcxMTc1QzEuMDI2NTYgMC4xNzExNzUgMC41Nzg4NCAwLjYxODg5IDAuNTc4ODQgMS4xNzExOFYxMC4xNzEyWk0xMC4wNDI5IDAuMjkyODkzTDAuODcxNzM0IDkuNDY0MDdMMi4yODU5NSAxMC44NzgzTDExLjQ1NzEgMS43MDcxMUwxMC4wNDI5IDAuMjkyODkzWiIgZmlsbD0iI0VGNUYyRCIvPgo8L3N2Zz4K', // Base64 encoded SVG
+          width: 20,
+          height: 20
+        }
+      }
+    ]
+  };
+
+  if (option && typeof option === "object") {
+    myChart.setOption(option);
+  }
+
+  window.addEventListener("resize", myChart.resize);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Doughnut Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 100%; max-width: 600px; height: 400px; margin: auto;">
+        <canvas id="donut-gradiant-chart-1"></canvas>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('donut-gradiant-chart-1').getContext('2d');
+
+            // Define gradient colors
+            const dc3dbg1 = ctx.createLinearGradient(0, 0, 0, 400);
+            dc3dbg1.addColorStop(0, 'rgba(255, 0, 0, 0.5)');
+            dc3dbg1.addColorStop(1, 'rgba(255, 0, 0, 0.5)');
+
+            const dc3dbg2 = ctx.createLinearGradient(100, 100, 200, 900);
+            dc3dbg2.addColorStop(0, 'rgba(110, 106, 219, 0.9)');
+            dc3dbg2.addColorStop(1, 'rgba(154, 149, 229, 0.9)');
+
+            const dc3dbg3 = ctx.createLinearGradient(0, 0, 0, 400);
+            dc3dbg3.addColorStop(0, 'rgba(116, 199, 225, 1)');
+            dc3dbg3.addColorStop(1, 'rgba(142, 210, 231, 1)');
+
+            const dc3dbg4 = ctx.createLinearGradient(0, 0, 0, 400);
+            dc3dbg4.addColorStop(0, 'rgba(248, 170, 136, 1)');
+            dc3dbg4.addColorStop(1, 'rgba(255, 175, 132, 1)');
+
+            const dc3dbg5 = ctx.createLinearGradient(0, 0, 0, 400);
+            dc3dbg5.addColorStop(0, 'rgba(130, 235, 219, 1)');
+            dc3dbg5.addColorStop(1, 'rgba(78, 210, 189, 1)');
+
+            // Data and check for empty data condition
+            const dataValues = [0, 0, 0, 0, 0];  // Change this to test with zero data
+            const isDataEmpty = dataValues.every(value => value === 0);
+
+            const data = {
+                labels: ['Not Registered', 'Already Registered', 'Converted', 'Not Deposited', 'Registered'],
+                datasets: [{
+                    label: 'Dataset 1',
+                    data: dataValues,
+                    backgroundColor: isDataEmpty ? 'rgba(200, 200, 200, 0.3)' : [dc3dbg1, dc3dbg2, dc3dbg3, dc3dbg4, dc3dbg5],
+                    borderWidth: 1
+                }]
+            };
+
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',  // Creates the doughnut effect
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 15,
+                            boxWidth: 10,
+                            color: '#555',
+                            textAlign: 'start'
+                        },
+                        align: 'start',
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#fff',
+                        borderColor: '#ccc',
+                        borderWidth: 3,
+                        titleColor: '#000',
+                        bodyColor: '#333',
+                        displayColors: false,
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const label = tooltipItem.label;
+                                const value = tooltipItem.raw;
+                                return `${label}\n──────────\n${value}`;
+                            }
+                        },
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 14
+                        }
+                    }
+                }
+            };
+
+            // Plugin for center text
+            const centerText = {
+                id: 'centerText',
+                beforeDraw(chart) {
+                    const { ctx, chartArea, data } = chart;
+                    ctx.save();
+                    const width = chartArea.width;
+                    const height = chartArea.height;
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const radius = Math.min(width, height) / 2;
+
+                    // Adjust font size based on chart size
+                    const fontSize = Math.min(radius / 5, 40);
+
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = `bold ${fontSize}px Arial`;
+                    ctx.fillStyle = 'rgba(111, 111, 111, 1)';
+                    ctx.fillText('Total Leads', centerX, centerY - fontSize / 3);
+
+                    ctx.font = `bold ${fontSize * 1.2}px Arial`;
+                    ctx.fillStyle = 'rgba(37, 40, 43, 1)';
+                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    ctx.fillText(total, centerX, centerY + fontSize * 1.2);
+                    ctx.restore();
+                }
+            };
+
+            // Plugin for inner border
+            const innerBorder = {
+                id: 'innerBorder',
+                afterDatasetsDraw(chart) {
+                    const { ctx, chartArea: { width, height } } = chart;
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const innerRadius = chart.getDatasetMeta(0).data[0].innerRadius;
+
+                    const gradient = ctx.createLinearGradient(30, 100, 60, 120);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+                    gradient.addColorStop(1, 'rgba(200, 200, 250, 0.1)');
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, innerRadius + 10, 0, Math.PI * 2);
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            };
+
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: options,
+                plugins: [centerText, innerBorder]
+            });
+        });
+    </script>
+</body>
+</html>

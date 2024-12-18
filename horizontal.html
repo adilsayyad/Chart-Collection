@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal Bar Chart with Scroll</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .horizontal_chart {
+            width: 80%;
+            margin: 50px auto;
+            position: relative;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            height: 200px;
+            overflow: scroll;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px; /* Set a fixed height */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        canvas {
+            display: block;
+            width: 100%; /* Ensures x-axis fits the container */
+        }
+
+        /* Tooltip styling */
+        .chartjs-tooltip-horizontal {
+            background-color: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            pointer-events: none;
+            position: absolute;
+        }
+
+        .chartjs-tooltip-horizontal .tooltip-column {
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .chartjs-tooltip-horizontal .tooltip-item {
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chartjs-tooltip-horizontal .divider {
+            border-top: 1px solid #ccc;
+            margin: 10px 0;
+        }
+
+        .chartjs-tooltip-horizontal .blue-text {
+            color: blue;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chartContainer" class="horizontal_chart">
+        <!-- Scrollable chart container -->
+        <div class="chart-container">
+            <canvas id="myHorizontalBarChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            var ctx = document.getElementById('myHorizontalBarChart').getContext('2d');
+
+            const Hbar1 = ctx.createLinearGradient(200, 100, 100, 250);
+            Hbar1.addColorStop(0, 'rgba(84, 184, 72, 1)');
+            Hbar1.addColorStop(1, 'rgba(9, 169, 75, 1)');
+
+            const Hbar2 = ctx.createLinearGradient(0, 0, 0, 250);
+            Hbar2.addColorStop(0, 'rgba(174, 157, 254, 1)');
+            Hbar2.addColorStop(1, 'rgba(79, 43, 253, 1)');
+
+            const Hbar3 = ctx.createLinearGradient(0, 0, 0, 250);
+            Hbar3.addColorStop(0, 'rgba(121, 168, 255, 1)');
+            Hbar3.addColorStop(1, 'rgba(0, 95, 255, 1)');
+
+            const Hbar4 = ctx.createLinearGradient(0, 0, 0, 250);
+            Hbar4.addColorStop(0, 'rgba(255, 211, 235, 1)');
+            Hbar4.addColorStop(1, 'rgba(255, 90, 90, 1)');
+
+            const Hbar5 = ctx.createLinearGradient(0, 0, 0, 250);
+            Hbar5.addColorStop(0, 'rgba(255, 172, 144, 1)');
+            Hbar5.addColorStop(1, 'rgba(255, 132, 89, 1)');
+
+            const Hbar6 = ctx.createLinearGradient(0, 0, 0, 250);
+            Hbar6.addColorStop(0, 'rgba(177, 229, 255, 1)');
+            Hbar6.addColorStop(1, 'rgba(95, 122, 255, 1)');
+
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['888', 'Playxat', '1Xbet', 'Winmach', 'Funmatch', 'Cricmatch', '888', 'Playxat', '1Xbet', 'Winmach', 'Funmatch', 'Cricmatch'],
+                    datasets: [{
+                        data: [52000, 40000, 30000, 30000, 20000, 20000, 52000, 40000, 30000, 30000, 20000, 20000],
+                        backgroundColor: [
+                            Hbar1,
+                            Hbar2,
+                            Hbar3,
+                            Hbar4,
+                            Hbar5,
+                            Hbar5,
+                            Hbar6,
+                            Hbar1,
+                            Hbar2,
+                            Hbar3,
+                            Hbar4,
+                            Hbar5,
+                            Hbar6
+                        ],
+                        borderWidth: 0,
+                        barThickness: 15,
+                        maxBarThickness: 20,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#6BA2FF',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: (value) => {
+                                return '₹' + formatNumber(value);
+                            }
+                        },
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#FF5733',
+                                callback: function (value) {
+                                    return formatNumber(value);
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            function formatNumber(value) {
+                return value.toLocaleString('en-IN');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

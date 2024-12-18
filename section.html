@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capsule Bar Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    #chart-container {
+      width: 80%;
+      height: 60vh;
+      margin: 50px auto;
+    }
+
+    /* Custom Tooltip Styling */
+    .chartjs-tooltip {
+      position: absolute;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); /* Add shadow */
+      padding: 10px;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      opacity: 0; /* Initially hidden */
+      transform: translateY(10px); /* For transition effect */
+    }
+
+    /* Show tooltip with animation */
+    .chartjs-tooltip.show {
+      opacity: 1;
+      transform: translateY(0); /* Animate into view */
+    }
+
+    .chartjs-tooltip:after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid white;
+      border-right: 5px solid transparent;
+      border-left: 5px solid transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="brandwise-section-chart">
+    <canvas id="brandwise-section-chart"></canvas>
+  </div>
+
+  <script>
+    var ctx = document.getElementById('brandwise-section-chart').getContext('2d');
+
+    // Create gradient for each dataset
+    var stack1 = ctx.createLinearGradient(0, 0, 0, 500);
+    stack1.addColorStop(0, 'rgba(180, 43, 255, 1)');
+    stack1.addColorStop(1, 'rgba(222, 98, 254, 1)');
+
+    var stack2 = ctx.createLinearGradient(0, 0, 0, 500);
+    stack2.addColorStop(0, 'rgba(61, 94, 255, 1)');
+    stack2.addColorStop(1, 'rgba(137, 184, 254, 1)');
+
+    var stack3 = ctx.createLinearGradient(0, 0, 0, 300);
+    stack3.addColorStop(0, 'rgba(254, 73, 23, 1)');
+    stack3.addColorStop(1, 'rgba(254, 163, 50, 1)');
+
+    var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['888', 'Winmatch', 'RajBet', 'Maxexch', 'Haboom' , 'Winclash' , 'Winclash' ,'Winclash','Winclash','Haboom','Winclash' ],
+        datasets: [
+          {
+            label: 'Sales Agent',
+            data: [12, 19, 13, 15, 12, 14, 14, 12, 13, 23, 11],
+            backgroundColor: stack1, // Apply gradient 1
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            stack: 'Stack 0',
+            barThickness: 10, // Reduce bar thickness
+            maxBarThickness: 10,
+            categoryPercentage: 10, // Adjust spacing between bars
+            barPercentage: 10,
+          },
+          {
+            label: 'Retention Agent',
+            data: [12, 19, 13, 15, 12, 14, 14, 12, 13, 23, 11],
+            backgroundColor: stack2, // Apply gradient 2
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            stack: 'Stack 0',
+            barThickness: 10, // Reduce bar thickness
+            maxBarThickness: 10,
+            categoryPercentage: 10, // Adjust spacing between bars
+            barPercentage: 10,
+          },
+          {
+            label: 'Sticky Agent',
+            data: [12, 19, 13, 15, 12, 14, 14, 12, 13, 23, 11],
+            backgroundColor: stack3, // Apply gradient 3
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            stack: 'Stack 0',
+            barThickness: 10, // Reduce bar thickness
+            maxBarThickness: 10,
+            categoryPercentage: 10, // Adjust spacing between bars
+            barPercentage: 10,
+          },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'end', // Align the legend to the right
+            labels: {
+              usePointStyle: true, // Use circular points in the legend
+              pointStyle: 'circle', // Specify the point style as circle
+              boxWidth: 10, // Control the size of the circular legend box
+              boxHeight: 10,
+            }
+          },
+          tooltip: {
+            enabled: false, // Disable the default tooltip
+            external: function(context) {
+              // Tooltip Element
+              var tooltipEl = document.getElementById('chartjs-tooltip');
+              if (!tooltipEl) {
+                tooltipEl = document.createElement('div');
+                tooltipEl.id = 'chartjs-tooltip';
+                tooltipEl.className = 'chartjs-tooltip';
+                document.body.appendChild(tooltipEl);
+              }
+
+              // Hide if no tooltip
+              var tooltipModel = context.tooltip;
+              if (tooltipModel.opacity === 0) {
+                tooltipEl.style.opacity = 0;
+                return;
+              }
+
+              // Set text and style of the tooltip
+              if (tooltipModel.body) {
+                var titleLines = tooltipModel.title || [];
+                var bodyLines = tooltipModel.body.map(function(item) {
+                  return item.lines;
+                });
+
+                var innerHtml ='<div style="text-align: center; font-weight: bold;">' + titleLines.join('<br>') + '</div>';
+                innerHtml += '<hr style="margin: 5px 0;">'; // Add line
+                innerHtml += '<div>';
+                bodyLines.forEach(function(body, i) {
+                  var color = tooltipModel.labelColors[i].backgroundColor;
+                  innerHtml += '<span style="background:' + color + '; border-radius: 50%; display: inline-block; width: 10px; height: 10px; margin-right: 10px;"></span>';
+                  innerHtml += body + '<br>';
+                });
+                innerHtml += '</div>';
+                tooltipEl.innerHTML = innerHtml;
+              }
+
+              // Position the tooltip
+              var position = context.chart.canvas.getBoundingClientRect();
+              tooltipEl.style.opacity = 1;
+              tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+              tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+
+              // Add the "show" class for animation
+              tooltipEl.classList.add('show');
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            barThickness: 0.5, // Reduce bar thickness
+            maxBarThickness: 0.5, // Ensure it doesn't exceed this
+            categoryPercentage: 0.5, // Adjust spacing between bars
+            barPercentage: 0.5, // Adjust the width of the bars within the category
+            ticks: {
+              maxRotation: 0,
+              minRotation: 0
+            }
+          },
+          y: {
+            stacked: true
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

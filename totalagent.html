@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horizontal Stacked Bar Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .custom-legend {
+      display: flex;
+      flex-direction: column; /* Arrange the legend in a vertical column */
+      align-items: flex-start;
+      margin-top: 0; /* Remove top margin to reduce space */
+    }
+
+    .custom-legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2px; /* Reduce spacing between legend items */
+    }
+
+    .legend-color-box {
+      width: 10px; /* Adjust for better visibility */
+      height: 20px;
+      margin-right: 5px; /* Reduce spacing between color box and label */
+    }
+
+    .legend-label {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: normal;
+      color: #333;
+      margin-right: 5px; /* Reduce spacing between label and value */
+    }
+
+    .legend-value {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: normal;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myChart" width="100" height="200"></canvas>
+  <div id="legend" class="custom-legend"></div>
+
+  <script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Progress'],  // Single label for the single bar
+        datasets: [
+          {
+            label: 'Active Agent',
+            data: [60],  // Represents 60% of progress
+            backgroundColor: 'rgba(94, 205, 13, 1)',  // Color for the first section (60%)
+            barThickness: 40,  // Adjust bar thickness
+             // Adjust bar thickness
+            borderColor: 'white',  // Add a border color for gap simulation
+            borderWidth: {top: 0, right: 5, bottom: 0, left: 0} 
+          },
+          {
+            label: 'Inactive Agent',
+            data: [40],  // Represents 40% of progress
+            backgroundColor: 'rgba(248, 96, 109, 1)',  // Color for the second section (40%)
+            barThickness: 40,  // Adjust bar thickness
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',  // Horizontal bar chart
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false  // Disable the default legend display
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,  // Stack the bars horizontally
+            grid: {
+              display: false,  // Remove x-axis grid lines
+            },
+            border: {
+              display: false  // Hide the axis border
+            },
+            ticks: {
+              display: false  // Hide the x-axis labels
+            }
+          },
+          y: {
+            stacked: true,
+            grid: {
+              display: false,  // Remove y-axis grid lines
+            },
+            border: {
+              display: false  // Hide the axis border
+            },
+            ticks: {
+              display: false  // Hide the y-axis labels
+            }
+          }
+        },
+        elements: {
+          bar: {
+            borderSkipped: false,  // Ensure the border is not skipped
+          }
+        },
+        barPercentage: 0.9,  // Reduce the width of the bars
+        categoryPercentage: 0.5  // Reduce the width of the category
+      },
+      plugins: [{
+        id: 'customLegend',
+        afterDraw: (chart) => {
+          const legendContainer = document.getElementById('legend');
+          legendContainer.innerHTML = ''; // Clear existing legend
+
+          chart.data.datasets.forEach((dataset, i) => {
+            const item = document.createElement('div');
+            item.className = 'custom-legend-item';
+
+            const colorBox = document.createElement('div');
+            colorBox.className = 'legend-color-box';
+            colorBox.style.backgroundColor = dataset.backgroundColor;
+
+            const label = document.createElement('div');
+            label.className = 'legend-label';
+            label.innerText = dataset.label;
+
+            const value = document.createElement('div');
+            value.className = 'legend-value';
+            value.innerText = dataset.data[0] + '%';
+
+            item.appendChild(colorBox);
+            item.appendChild(label);
+            item.appendChild(value);
+            legendContainer.appendChild(item);
+          });
+        }
+      }]
+    });
+  </script>
+</body>
+</html>

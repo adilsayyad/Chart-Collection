@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3 Line Chart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .tooltip {
+        position: absolute;
+        opacity: 0;
+        background: white;
+        color: black;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chart-container" style="width: 80%; margin: auto;">
+      <svg id="lineChart" width="800" height="500"></svg>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+    <script>
+      // Data for the chart
+      const data = [
+        { date: "02 Jan", sales: 25000, retention: 25000 },
+        { date: "03 Jan", sales: 35000, retention: 38000 },
+        { date: "04 Jan", sales: 30000, retention: 30000 },
+        { date: "05 Jan", sales: 40000, retention: 45000 },
+        { date: "06 Jan", sales: 35000, retention: 40000 },
+        { date: "07 Jan", sales: 50000, retention: 50000 },
+        { date: "08 Jan", sales: 55000, retention: 60000 },
+      ];
+
+      const margin = { top: 50, right: 50, bottom: 50, left: 70 };
+      const width = 800 - margin.left - margin.right;
+      const height = 500 - margin.top - margin.bottom;
+
+      // Create SVG and group for the chart
+      const svg = d3
+        .select("#lineChart")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      // Set up scales
+      const x = d3
+        .scalePoint()
+        .domain(data.map((d) => d.date))
+        .range([0, width]);
+
+      const y = d3
+        .scaleLinear()
+        .domain([0, d3.max(data, (d) => Math.max(d.sales, d.retention))])
+        .nice()
+        .range([height, 0]);
+
+      // Line generator
+      const lineGenerator = d3
+        .line()
+        .x((d) => x(d.date))
+        .y((d) => y(d.sales))
+        .curve(d3.curveCardinal);
+
+      const lineGenerator2 = d3
+        .line()
+        .x((d) => x(d.date))
+        .y((d) => y(d.retention))
+        .curve(d3.curveCardinal);
+
+      // Define gradients
+      const gradient = svg
+        .append("defs")
+        .append("linearGradient")
+        .attr("id", "line-gradient")
+        .attr("x1", "0%")
+        .attr("x2", "100%")
+        .attr("y1", "0%")
+        .attr("y2", "0%");
+
+      gradient
+        .append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", "rgba(98, 139, 255, 1)");
+
+      gradient
+        .append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "rgba(98, 139, 255, 1)");
+
+      const gradient2 = svg
+        .append("defs")
+        .append("linearGradient")
+        .attr("id", "line-gradient2")
+        .attr("x1", "0%")
+        .attr("x2", "100%")
+        .attr("y1", "0%")
+        .attr("y2", "0%");
+
+      gradient2
+        .append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", "rgba(203, 70, 255, 1)");
+
+      gradient2
+        .append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "rgba(199, 71, 254, 1)");
+
+      // Add lines
+      svg
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "url(#line-gradient)")
+        .attr("stroke-width", 2)
+        .attr("d", lineGenerator);
+
+      svg
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "url(#line-gradient2)")
+        .attr("stroke-width", 2)
+        .attr("d", lineGenerator2);
+
+      // Add axes
+      svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+
+      svg.append("g").call(
+        d3.axisLeft(y).tickFormat((d) => (d >= 1000 ? d / 1000 + "k" : d))
+      );
+
+      // Add tooltip
+      const tooltip = d3.select("#tooltip");
+
+      svg
+        .selectAll("circle")
+        .data(data)
+        .join("circle")
+        .attr("r", 5)
+        .attr("fill", "rgba(203, 70, 255, 1)")
+        .attr("cx", (d) => x(d.date))
+        .attr("cy", (d) => y(d.sales))
+        .on("mouseover", (event, d) => {
+          tooltip
+            .style("opacity", 1)
+            .style("left", event.pageX + "px")
+            .style("top", event.pageY - 30 + "px")
+            .html(
+              `<b>Date:</b> ${d.date}<br><b>Sales:</b> ₹${d.sales}<br><b>Deposits:</b> ${
+                d.sales / 10000
+              }`
+            );
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0));
+
+      svg
+        .selectAll(".retention-circle")
+        .data(data)
+        .join("circle")
+        .attr("class", "retention-circle")
+        .attr("r", 5)
+        .attr("fill", "rgba(98, 139, 255, 1)")
+        .attr("cx", (d) => x(d.date))
+        .attr("cy", (d) => y(d.retention))
+        .on("mouseover", (event, d) => {
+          tooltip
+            .style("opacity", 1)
+            .style("left", event.pageX + "px")
+            .style("top", event.pageY - 30 + "px")
+            .html(
+              `<b>Date:</b> ${d.date}<br><b>Retention:</b> ₹${d.retention}<br><b>Deposits:</b> ${
+                d.retention / 10000
+              }`
+            );
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0));
+    </script>
+  </body>
+</html>

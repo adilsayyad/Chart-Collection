@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Doughnut Chart with Legends</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .customer-overview-donutchart-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            max-height: 400px;
+        }
+
+        .customer-overview-donutchart {
+            display: block;
+            border-radius: 50%;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Style for custom legend */
+        .customer-status-custom-legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap; /* Allow legend to wrap on smaller screens */
+        }
+
+        .customer-status-custom-legend-item {
+            display: flex;
+            flex-direction: column; /* Stack name and value vertically */
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        /* Flexbox row for dot and name */
+        .customer-status-legend-label {
+            display: flex;
+            align-items: center;
+        }
+
+        .customer-status-custom-legend-item canvas {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 8px;
+            border-radius: 50%;
+        }
+
+        .customer-status-legend-value {
+            margin-top: 4px;
+            font-size: 20px;
+            margin-left : 10px
+        }
+    </style>
+</head>
+<body>
+    <div class="customer-overview-donutchart-container">
+        <canvas id="customer-overview-donutchart" class="customer-overview-donutchart"></canvas>
+    </div>
+    <div id="customer-status-legend" class="customer-status-custom-legend"></div>
+
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('customer-overview-donutchart');
+    const ctx = canvas.getContext('2d');
+
+    // Define gradient for the doughnut chart segments (for the chart itself)
+    const gradient1 = ctx.createLinearGradient(0, 0, 0, 250);
+    gradient1.addColorStop(0, 'rgba(15, 170, 105, 1)');
+    gradient1.addColorStop(1, 'rgba(131, 222, 162, 1)');
+
+    const gradient2 = ctx.createLinearGradient(0, 0, 0, 250);
+    gradient2.addColorStop(0, 'rgba(255, 161, 134, 1)');
+    gradient2.addColorStop(1, 'rgba(255, 23, 23, 1)');
+
+    const data = {
+        labels: ['Active', 'Inactive'],  // Labels for the legend
+        datasets: [{
+            label: 'My Dataset',
+            data: [40000, 80000],
+            backgroundColor: [
+                gradient2,  // Gradient for Inactive
+                gradient1  // Gradient for Active
+            ],
+            borderWidth: 5,
+            borderRadius: 15
+        }]
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,  // Ensures the chart uses full available height
+        plugins: {
+            legend: {
+                display: false // Disable default legend
+            }
+        },
+        cutout: '80%',
+        layout: {
+            padding: {
+                bottom: 0
+            }
+        }
+    };
+
+    function formatNumber(value) {
+        if (value >= 100000) {
+            return (value / 100000).toFixed(1) + ' lakh';
+        }
+        return value;
+    }
+
+    const config = {
+        type: 'doughnut',
+        data: data,
+        options: options,
+        plugins: [{
+            id: 'centerText',
+            beforeDraw: (chart) => {
+                const { width, height, ctx } = chart;
+                const centerX = width / 2;
+                const centerY = height / 2;
+
+                const radius = (Math.min(width, height) * 0.36);
+
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Draw inside circle background with light green color
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(131, 222, 162, 0.2)';
+                ctx.fill();
+                ctx.closePath();
+
+                // Draw "Total Customer" text
+                ctx.font = 'bold ' + (width * 0.01) + 'px Arial';
+                ctx.fillStyle = 'rgba(111, 111, 111, 1)';
+                ctx.fillText("Total Customers", centerX, centerY - radius / 6);
+
+                // Draw total value
+                ctx.font = 'bold ' + (width * 0.02) + 'px Arial';
+                ctx.fillStyle = 'black';
+
+                const total = chart.data.datasets[0].data.reduce((acc, val) => acc + val, 0);
+                const formattedTotal = formatNumber(total);
+                ctx.fillText(formattedTotal, centerX, centerY + radius / 9);
+
+                ctx.restore();
+            }
+        }]
+    };
+
+    const chart = new Chart(ctx, config);
+
+    // Function to create custom legend with gradient color dots
+    function createCustomLegend(chart) {
+        const legendContainer = document.getElementById('customer-status-legend');
+        const dataset = chart.data.datasets[0];
+
+        dataset.data.forEach((dataValue, index) => {
+            const legendItem = document.createElement('div');
+            legendItem.classList.add('customer-status-custom-legend-item');
+
+            // Create row with color dot and label
+            const labelRow = document.createElement('div');
+            labelRow.classList.add('customer-status-legend-label');
+
+            // Create a canvas for the gradient dot
+            const colorCanvas = document.createElement('canvas');
+            colorCanvas.width = 12;
+            colorCanvas.height = 12;
+            const colorCtx = colorCanvas.getContext('2d');
+
+            // Draw the gradient circle on the canvas
+            const gradient = chart.data.datasets[0].backgroundColor[index];
+            const gradientFill = colorCtx.createLinearGradient(0, 0, 12, 12);
+            
+            // Copy gradient stops from chart gradient (approximately)
+            if (index === 0) { // Inactive (Red gradient)
+                gradientFill.addColorStop(0, 'rgba(255, 161, 134, 1)');
+                gradientFill.addColorStop(1, 'rgba(255, 23, 23, 1)');
+            } else { // Active (Green gradient)
+                gradientFill.addColorStop(0, 'rgba(15, 170, 105, 1)');
+                gradientFill.addColorStop(1, 'rgba(131, 222, 162, 1)');
+            }
+
+            colorCtx.fillStyle = gradientFill;
+            colorCtx.beginPath();
+            colorCtx.arc(6, 6, 6, 0, 2 * Math.PI);
+            colorCtx.fill();
+            colorCtx.closePath();
+
+            const labelText = document.createTextNode(chart.data.labels[index]);
+
+            // Append canvas and name in the same row
+            labelRow.appendChild(colorCanvas);
+            labelRow.appendChild(labelText);
+
+            // Create element for value below the label
+            const valueText = document.createElement('div');
+            valueText.classList.add('customer-status-legend-value');
+            valueText.textContent = formatNumber(dataValue);
+
+            // Append label row and value to the legend item
+            legendItem.appendChild(labelRow);
+            legendItem.appendChild(valueText);
+
+            // Append the legend item to the container
+            legendContainer.appendChild(legendItem);
+        });
+    }
+
+    // Generate custom legend
+    createCustomLegend(chart);
+
+    // Resize chart based on window resizing
+    window.addEventListener('resize', () => {
+        chart.resize();
+    });
+   });
+</script>
+</body>
+</html>

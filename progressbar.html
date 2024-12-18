@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress Bar using Chart.js</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+
+    .progress-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    canvas {
+      max-width: 500px; /* Adjust the width as necessary */
+      margin-right: 20px; /* Space between label and bar */
+    }
+    .progress-label-insta {
+      font-family: IBM Plex Sans;
+     font-size: 14px;
+     font-weight: 400;
+     color: rgba(37, 40, 43, 1);
+    }
+  </style>
+</head>
+<body>
+
+  
+    <div class="progress-container">
+      <canvas id="progressChart-instagram"></canvas>
+      <div class="progress-label-insta" id="progressLabel-insta">75%</div>
+    </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var ctx = document.getElementById('progressChart-instagram').getContext('2d');
+      var progressLabel = document.getElementById('progressLabel-insta');
+      var progressValue = 45; // Set the progress value (in percentage)
+      var emptyValue = 100 - progressValue; // Empty part of the bar
+
+      var progressChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Progress'], // Single label for the progress bar
+          datasets: [
+            {
+              label: 'Filled',
+              data: [progressValue], // Filled part of the progress bar
+              backgroundColor: 'rgba(231, 1, 118, 1)', // Color of the filled bar
+              borderRadius: { topLeft: 10, bottomLeft: 10 }, // Rounded left corners
+              borderSkipped: false, // Do not skip any borders
+              borderColor: 'rgba(200, 200, 200, 0.5)', // Border color for the filled portion
+              borderWidth: { top: 5, bottom: 5, left: 5, right: 0 }, // Only left border
+              barThickness: 20 // Height of the progress bar
+            },
+            {
+              label: 'Empty',
+              data: [emptyValue], // Empty part of the progress bar
+              backgroundColor: 'rgba(200, 200, 200, 0.5)', // Light gray color for the empty part
+              borderRadius: { topRight: 10, bottomRight: 10 }, // Rounded right corners
+              borderSkipped: false, // Do not skip any borders
+              borderColor: 'rgba(200, 200, 200, 0.5)', // Border color for the empty portion
+              borderWidth: 0, // Only right border
+              barThickness: 20 // Height of the progress bar
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y', // Horizontal bar
+          scales: {
+            x: {
+              beginAtZero: true, // Start from 0
+              max: 100, // Set max value as 100
+              stacked: true, // Stack bars horizontally
+              display: false // Hide x-axis
+            },
+            y: {
+              stacked: true, // Stack bars on y-axis
+              display: false // Hide y-axis
+            }
+          },
+          plugins: {
+            legend: {
+              display: false // Hide legend
+            },
+            tooltip: {
+              enabled: false // Disable tooltips
+            },
+            animation: {
+              duration: 1000, // Animation duration (1 second)
+              easing: 'easeInOutQuart' // Smooth animation easing
+            }
+          }
+        }
+      });
+
+      // Update the progress label dynamically
+      progressLabel.textContent = progressValue + '%';
+    });
+  </script>
+
+</body>
+</html>

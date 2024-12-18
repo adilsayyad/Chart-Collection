@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horizontal Progress Bar with Custom Legend</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .chart-legend {
+      display: flex;
+      justify-content: space-between; /* Align two sections of the legend side by side */
+      width: 100%;
+      margin-top: 10px; /* Space between the chart and the legend */
+    }
+
+    .legend-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 48%; /* Make two sections take up almost equal space */
+    }
+
+    .chart-legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px; /* Reduced gap between legend items */
+    }
+
+    .chart-legend-item .legend-color-box {
+      width: 5px;
+      height: 30px;
+      margin-right: 10px;
+    }
+
+    .chart-legend-item .legend-label {
+      font-family: IBM Plex Sans;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18.2px;
+      text-align: left;
+      color: rgba(82, 87, 92, 1);
+    }
+  </style>
+</head>
+<body>
+<div class="total-agent-chart">
+  <canvas id="progressBar"></canvas>
+  <div id="legend" class="chart-legend">
+    <div id="legendLeft" class="legend-section"></div>
+    <div id="legendRight" class="legend-section"></div>
+  </div>
+</div>
+
+<script>
+  const ctx = document.getElementById('progressBar').getContext('2d');
+  const progressBar = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Progress'],
+      datasets: [
+        {
+          label: 'Active Agent',
+          data: [6],
+          backgroundColor: 'rgba(94, 205, 13, 1)',
+          barThickness: 10,
+        },
+        {
+          label: 'Inactive Agents',
+          data: [3],
+          backgroundColor: 'rgba(248, 96, 109, 1)',
+          barThickness: 10,
+        },
+        {
+          label: 'Active Agent',
+          data: [6],
+          backgroundColor: 'rgba(94, 205, 13, 1)',
+          barThickness: 10,
+        },
+        {
+          label: 'Inactive Agents',
+          data: [3],
+          backgroundColor: 'rgba(248, 96, 109, 1)',
+          barThickness: 10,
+        },
+        {
+          label: 'Active Agent',
+          data: [6],
+          backgroundColor: 'rgba(94, 205, 13, 1)',
+          barThickness: 10,
+        },
+        {
+          label: 'Inactive Agents',
+          data: [3],
+          backgroundColor: 'rgba(248, 96, 109, 1)',
+          barThickness: 10,
+        },
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false  // Hide the default legend
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+          max: 100,
+          grid: {
+            display: false
+          },
+          ticks: {
+            display: false
+          },
+        },
+        y: {
+          stacked: true,
+          grid: {
+            display: false
+          },
+          ticks: {
+            display: false
+          }
+        }
+      },
+      elements: {
+        bar: {
+          borderSkipped: false,
+          borderColor: 'rgba(0, 0, 0, 0)',
+          borderWidth: 3
+        }
+      }
+    },
+    plugins: [{
+      id: 'customLegend',
+      afterDraw: (chart) => {
+        const legendLeft = document.getElementById('legendLeft');
+        const legendRight = document.getElementById('legendRight');
+
+        // Clear previous content
+        legendLeft.innerHTML = '';
+        legendRight.innerHTML = '';
+
+        // Iterate through the datasets and split between two sections
+        chart.data.datasets.forEach((dataset, i) => {
+          const item = document.createElement('div');
+          item.className = 'chart-legend-item';
+
+          const colorBox = document.createElement('div');
+          colorBox.className = 'legend-color-box';
+          colorBox.style.backgroundColor = dataset.backgroundColor;
+
+          const label = document.createElement('div');
+          label.className = 'legend-label';
+          label.innerText = `${dataset.label}: ${dataset.data[0]}%`;
+
+          item.appendChild(colorBox);
+          item.appendChild(label);
+
+          // Add alternating items to left and right sections
+          if (i % 2 === 0) {
+            legendLeft.appendChild(item);
+          } else {
+            legendRight.appendChild(item);
+          }
+        });
+      }
+    }]
+  });
+</script>
+
+</body>
+</html>

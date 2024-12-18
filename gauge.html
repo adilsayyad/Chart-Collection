@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Progress Gauge - Apache ECharts Demo</title>
+  <script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .gauge-chart {
+      position: relative;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="gauge-chart" class="gauge-chart"></div>
+
+  <script>
+    var dom = document.getElementById('gauge-chart');
+    var myChart = echarts.init(dom, null, {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+
+    var option = {
+      responsive: true,
+      series: [
+        {
+          type: 'gauge',
+          startAngle: 180,
+          endAngle: 0,
+          min: 0,
+          max: 240,
+          splitNumber: 12,
+          roundCap: true, 
+          progress: {
+            show: true,
+            roundCap: false,
+            width: 20
+          },
+          itemStyle: {
+            color: 'rgba(16, 167, 13, 1)',
+            shadowColor: 'rgba(16, 167, 13, 9)',
+            shadowBlur: 0,
+            shadowOffsetX: 0,
+            shadowOffsetY: 0
+          },
+          pointer: {
+            show: true,
+            length: '60%',  // Length of the pointer
+            width: 7, 
+            itemStyle: {
+              color: 'rgba(82, 87, 92, 1)',
+              shadowColor: 'black',
+              shadowBlur: 0,
+              shadowOffsetX: 0,
+              shadowOffsetY: 0,  // Pointer color,
+              offsetCenter: [5, '0%'],
+            },
+          },
+          axisLine: {
+            lineStyle: {
+              width: 19,
+              color: [
+                [0.5, 'rgba(255, 191, 4, 0.2)'],
+                [1, 'rgba(251, 1, 0, 0.2)']
+              ]
+            }
+          },
+          axisTick: {
+            show: true,
+            length: 50,
+            splitNumber: 1,
+            lineStyle: {
+              width: 0.5,
+              color: 'rgba(82, 87, 92, 0.1)'
+            }
+          },
+          splitLine: {
+            length: 0,
+            lineStyle: {
+              width: 0,
+              color: ''
+            }
+          },
+          axisLabel: {
+            color: 'rgba(82, 87, 92, 1)',
+            fontSize: 10,
+            formatter: function (value) {
+              if (value === 0) {
+                return '{value|0%}';  // Label for 0 with margin
+              } else if (value === 240) {
+                return '{value|240%}';  // Label for 240 with margin
+              }
+              return '';  // Hide all other labels
+            },
+            rich: {
+              value: {
+                fontSize: 10,
+                color: '#999',
+                padding: [0, -5, 0, 20]  // Adjust padding for proper spacing from the gauge bar
+              }
+            },
+            distance: -50  // Global distance to ensure labels are positioned closer to the gauge without overlapping
+          },
+          detail: {
+            backgroundColor: '',
+            borderColor: '',
+            borderWidth: 0,
+            width: '100%',
+            lineHeight: 50,
+            height: 10, // Increased height for extra text
+            borderRadius: 0,
+            offsetCenter: [10, '40%'],  // Adjusted value display location
+            valueAnimation: true,
+            formatter: function (value) {
+              // Combining percentage and "more than" text on one line
+              return '{value|' + value.toFixed(0) + '}{unit|%}\n{percentage|+50%} {more|than last month}';
+            },
+            rich: {
+              value: {
+                fontSize: 40,
+                fontWeight: 'bolder',
+                color: '#000'
+              },
+              unit: {
+                fontSize: 30,
+                color: '#000',
+                padding: [0, 10, 0,5]
+              },
+              // Style for the percentage text
+              percentage: {
+                fontSize: 25,
+                color: 'rgba(216, 32, 29, 1)', // Green color for percentage
+                fontWeight: 'bold',
+                padding: [1, 0, 0, 0] // Padding for proper spacing
+              },
+              // Style for the "more than" text
+              more: {
+                fontSize: 20,
+                color: 'rgba(160, 164, 168, 1)',
+                padding: [0, 0, 0, 0] // Padding for proper spacing
+              }
+            }
+          },
+          data: [
+            {
+              value: 100 // Speed value
+            }
+          ]
+        },
+        // Adding a circular "dot" on the pointer
+        {
+          type: 'gauge',
+          startAngle: 180,
+          endAngle: 0,
+          min: 0,
+          max: 240,
+          splitNumber: 12,
+          pointer: {
+            show: true,
+            icon: 'circle',  // Circular dot at the pointer end
+            length: '0%',    // Size of the dot
+            width: 90,       // Dot's diameter
+            offsetCenter: [0, '20%'],  // Position of the dot (on pointer's end)
+            itemStyle: {
+              color: 'rgba(82, 87, 92, 1)' ,
+              borderColor: "white",
+              borderWidth: 5
+            }
+          },
+          axisLine: {
+            show: false
+          },
+          splitLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            show: false
+          },
+          detail: {
+            show: false
+          },
+          data: [
+            {
+              value: 100
+            }
+          ]
+        }
+      ]
+    };
+
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+  </script>
+
+</body>
+</html>

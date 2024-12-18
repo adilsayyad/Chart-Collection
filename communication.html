@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horizontal Stacked Bar Chart with Gaps</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .custom-legend-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0;
+    }
+
+    .call-type-legend-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .call-type-legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px; /* Reduced the margin to reduce the white space */
+    }
+
+    .call-type-color-box {
+      width: 5px;
+      height: 20px;
+      margin-right: 5px;
+    }
+
+    .call-type-legend-text {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: normal;
+      color: #333;
+      margin-right: 5px;
+    }
+
+    .call-type-legend-value-text {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="call-type-overview-chart" width="400" height="200"></canvas>
+  <div id="call-type-legend-container" class="custom-legend-container"></div>
+
+  <script>
+    // Chart
+    const formatNumber = (num) => {
+      return num.toLocaleString(); // Format number in thousands
+    };
+  
+    const ctx = document.getElementById('call-type-overview-chart').getContext('2d');
+    const barChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Progress'],  // Single label for the single bar
+        datasets: [
+          {
+            label: 'Cold Call',
+            data: [78201],
+            backgroundColor: 'rgba(94, 205, 13, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 1',
+            data: [52134],
+            backgroundColor: 'rgba(253, 172, 65, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 2',
+            data: [52134],
+            backgroundColor: 'rgba(89, 141, 238, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 3',
+            data: [72881],
+            backgroundColor: 'rgba(58, 218, 138, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 4',
+            data: [10000],
+            backgroundColor: 'rgba(0, 206, 219, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 5',
+            data: [91287],
+            backgroundColor: 'rgba(255, 76, 0, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 6',
+            data: [110202],
+            backgroundColor: 'rgba(143, 0, 255, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 7',
+            data: [6000],
+            backgroundColor: 'rgba(241, 30, 30, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          },
+          {
+            label: 'Inactive Agent 8',
+            data: [50560],
+            backgroundColor: 'rgba(172, 173, 175, 1)',
+            barThickness: 20,
+            borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+            borderSkipped: false,
+            borderColor: '#fff',
+            borderWidth: 3,
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            enabled: false
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            grid: {
+              display: false,
+            },
+            border: {
+              display: false
+            },
+            ticks: {
+              display: false
+            }
+          },
+          y: {
+            stacked: true,
+            grid: {
+              display: false,
+            },
+            border: {
+              display: false
+            },
+            ticks: {
+              display: false
+            }
+          }
+        },
+        elements: {
+          bar: {
+            borderSkipped: false,
+            borderRadius: 10,
+            barThickness: 30,
+          }
+        },
+        layout: {
+          padding: {
+            top: 10,
+            bottom: 10,
+            left: 0,
+            right: 0
+          }
+        }
+      },
+      plugins: [{
+        id: 'customLegend',
+        afterDraw: (chart) => {
+          const legendContainer = document.getElementById('call-type-legend-container');
+          legendContainer.innerHTML = '';
+  
+          const firstSection = document.createElement('div');
+          firstSection.className = 'call-type-legend-section';
+  
+          const secondSection = document.createElement('div');
+          secondSection.className = 'call-type-legend-section';
+  
+          chart.data.datasets.forEach((dataset, i) => {
+            const item = document.createElement('div');
+            item.className = 'call-type-legend-item';
+  
+            const colorBox = document.createElement('div');
+            colorBox.className = 'call-type-color-box';
+            colorBox.style.backgroundColor = dataset.backgroundColor;
+  
+            const label = document.createElement('div');
+            label.className = 'call-type-legend-text';
+            label.innerText = dataset.label;
+  
+            const value = document.createElement('div');
+            value.className = 'call-type-legend-value-text';
+            value.innerText = formatNumber(dataset.data[0]); // Format value
+  
+            item.appendChild(colorBox);
+            item.appendChild(label);
+            item.appendChild(value);
+  
+            if (i < 5) {
+              firstSection.appendChild(item);
+            } else {
+              secondSection.appendChild(item);
+            }
+          });
+  
+          legendContainer.appendChild(firstSection);
+          legendContainer.appendChild(secondSection);
+        }
+      }]
+    });
+  </script>
+</body>
+</html>

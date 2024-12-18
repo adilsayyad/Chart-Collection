@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Bar Chart with Chart.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .double-bar-chart {
+            width: 80%;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div class="double-bar-chart">
+        <canvas id="doubleBarChart"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('doubleBarChart').getContext('2d');
+
+            // Define gradient colors for the datasets
+            const doublebar1 = ctx.createLinearGradient(200, 410, 200, 100);
+            doublebar1.addColorStop(0, 'rgba(15, 10, 254, 1)');
+            doublebar1.addColorStop(1, 'rgba(178, 210, 230, 6)');
+
+            const doublebar2 = ctx.createLinearGradient(200, 100, 100, 250);
+            doublebar2.addColorStop(0, 'rgba(238, 185, 48, 1)');
+            doublebar2.addColorStop(1, 'rgba(254, 130, 53, 1)');
+
+            const data = {
+                labels: ['888', 'Winmatch', 'RajBet', 'RajBet', 'Maxexchange', 'Haboom', 'Winclash', 'Winclash', 'Winclash', 'Winclash', 'Haboom', 'Winclash'], // X-axis labels
+                datasets: [
+                    {
+                        label: 'Contacts', // Label for dataset 1
+                        data: [12, 19, 3, 5, 2, 15, 5, 16, 24, 10, 11, 12], // Data for Series 1
+                        backgroundColor: doublebar1,
+                        borderColor: '',
+                        borderWidth: 0,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.5,
+                        borderRadius: 10
+                    },
+                    {
+                        label: 'VIP', // Label for dataset 2
+                        data: [12, 19, 3, 5, 2, 15, 5, 16, 24, 10, 10, 2], // Data for Series 2
+                        backgroundColor: doublebar2,
+                        borderColor: '',
+                        borderWidth: 0,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.5,
+                        borderRadius: 10
+                    }
+                ]
+            };
+
+            const options = {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: false, // Set to true if you want stacked bars
+                        beginAtZero: true
+                    },
+                    y: {
+                        stacked: false, // Set to true if you want stacked bars
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false, // Hide the legend
+                    },
+                    tooltip: {
+                        mode: 'index', // Show both tooltips for the same index
+                        intersect: false, // Ensure tooltip appears for both datasets even if only one bar is hovered
+                        callbacks: {
+                            label: function(context) {
+                                // Fetch the dataset label and value
+                                const datasetLabel = context.dataset.label || '';
+                                const value = context.parsed.y;
+
+                                // Return the formatted label and value
+                                return `${datasetLabel}: ${value}`;
+                               
+                            },
+                            afterTitle: function() {
+                                // Add a line separator after the label
+                                return ['──────────'];
+                            }
+                                // Add a line separator after the label
+                           
+                        },
+                        // Customizing the tooltip appearance
+                        backgroundColor: '#ffffff', // White background for the tooltip
+                        titleColor: 'rgba(82, 87, 92, 1)', // Title color
+                        bodyColor: '#000', // Text color
+                        borderColor: '#ccc', // Border color for the tooltip
+                        borderWidth: 1, // Border width
+                        bodySpacing: 10, // Space between lines in the tooltip
+                        displayColors: true, // Show dataset color in tooltip
+                        usePointStyle: true,
+                        titleAlign: 'center',
+           
+                         // Use circles instead of squares for dataset colors
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 14,
+                            weight: 'bold',
+                            
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: options
+            });
+        });
+    </script>
+</body>
+</html>
